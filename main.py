@@ -14,6 +14,7 @@ def transDocument(handle, column, appid, secretKey):
     translateTimeStart = time.time()
     cnt = 0
     while cnt < handle.max_row:
+        print("当前翻译第{}行".format(cnt))
         tmp = 0
         string = ""
         for i in range(cnt + 1, handle.max_row + 1):
@@ -22,14 +23,14 @@ def transDocument(handle, column, appid, secretKey):
                     string = string + handle.readExcel(i, column) + separator
                     tmp = tmp + 1
                 else:
-                    tmp = tmp + 1
+                    tmp = tmp
                     break
             else:
                 if len(string) + 1 < charNumLimit:
                     string = string + separator
                     tmp = tmp + 1
                 else:
-                    tmp = tmp + 1
+                    tmp = tmp
                     break
         for timeOut in range(100):
             if timeOut != 99:
@@ -71,6 +72,7 @@ if __name__ == '__main__':
     try:
         wb = excelOperate.operateExecl(fileName.replace("\"", ""))
         wb.openExcel()
+        print("共{}行".format(wb.max_row))
         if seletColumn == "":
             for i in range(1, wb.max_column+1):
                 transDocument(wb, i, appid, secretKey)
