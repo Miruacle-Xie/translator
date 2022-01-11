@@ -13,14 +13,20 @@ def transDocument(handle, column, appid, secretKey):
     handle.insertColumn(handle.max_column+1)
     translateTimeStart = time.time()
     cnt = 0
+    colEndFlag = False
     while cnt < handle.max_row:
-        print("当前翻译第{}行".format(cnt))
+        print("当前翻译第{}列, 第{}行".format(column, cnt))
         tmp = 0
         string = ""
         cellValue = ""
+        cntSpace = 0
         for i in range(cnt + 1, handle.max_row + 1):
-            # print("handle.readExcel(i, column):{}, i:{}".format(handle.readExcel(i, column), i))
+            if cntSpace >= 10:
+                colEndFlag = True
+                break
+            # print("{}行,{}列:{}".format(i, column, handle.readExcel(i, column)))
             if handle.readExcel(i, column) is not None:
+                cntSpace = 0
                 if isinstance(handle.readExcel(i, column), int):
                     cellValue = str(handle.readExcel(i, column))
                 else:
@@ -32,28 +38,37 @@ def transDocument(handle, column, appid, secretKey):
                     tmp = tmp
                     break
             else:
+                cntSpace = cntSpace + 1
                 if len(string) + 1 < charNumLimit:
                     string = string + separator
                     tmp = tmp + 1
                 else:
                     tmp = tmp
+                    cntSpace = 0
                     break
+        # print(string)
         for timeOut in range(100):
             if timeOut != 99:
                 translateResult = translateTool.BaiduTranslate('en', 'zh', appid, secretKey)
                 Results = translateResult.BdTrans(string)  # 要翻译的词组
+                # print(Results[0])
+                # print(Results[1])
                 if Results[0]:
                     for i in range(1, len(Results[1].split(separator))):
+                        # print("{}:{}".format(i, str(Results[1].split(separator)[i - 1])))
                         handle.writeExcel(i + cnt, handle.max_column, str(Results[1].split(separator)[i - 1]))
                     break
                 else:
-                    time.sleep(0.1)
+                    time.sleep(0.3)
             elif timeOut == 99:
-                handle.writeExcel(cnt, handle.max_column, "翻译超时")
+                # print("{},{}".format(cnt+1, handle.max_column))
+                handle.writeExcel(cnt+1, handle.max_column, "翻译超时")
                 break
         cnt = tmp + cnt
+        if colEndFlag:
+            break
     translateTime = time.time() - translateTimeStart
-    print(translateTime)
+    print("第{}列翻译耗时:{}".format(column, translateTime))
 
 
 def readIdPassword(fileName):
@@ -74,10 +89,17 @@ if __name__ == '__main__':
         else:
             appid, secretKey = readIdPassword(flag)
     fileName = input("\n需要翻译的文件路径：\n")
+    df = pandas.read_excel(fileName.replace("\"", ""), sheet_name=None)
+    # print(list(df))
+    sheetNum = input("按回车：翻译第一个表, 输入数字:指定表格{}\n".format(list(df)))
+    # '''
     seletColumn = input("\n按回车：全部翻译, 输入数字:指定列数翻译\n")
     try:
         wb = excelOperate.operateExecl(fileName.replace("\"", ""))
-        wb.openExcel()
+        if sheetNum == "":
+            wb.openExcel()
+        else:
+            wb.openExcel(list(df)[int(sheetNum) - 1])
         print("共{}行".format(wb.max_row))
         if seletColumn == "":
             for i in range(1, wb.max_column+1):
@@ -100,3 +122,4 @@ if __name__ == '__main__':
             input("请检查文档sheet名称, 存在非法字符\"{}\", 按任意键结束".format(string[charLen:charLen+1]))
         else:
             input("sorry, 出bug了, QAQ")
+    # '''
