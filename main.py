@@ -17,10 +17,16 @@ def transDocument(handle, column, appid, secretKey):
         print("当前翻译第{}行".format(cnt))
         tmp = 0
         string = ""
+        cellValue = ""
         for i in range(cnt + 1, handle.max_row + 1):
+            # print("handle.readExcel(i, column):{}, i:{}".format(handle.readExcel(i, column), i))
             if handle.readExcel(i, column) is not None:
-                if len(string) + len(handle.readExcel(i, column)) < charNumLimit:
-                    string = string + handle.readExcel(i, column) + separator
+                if isinstance(handle.readExcel(i, column), int):
+                    cellValue = str(handle.readExcel(i, column))
+                else:
+                    cellValue = handle.readExcel(i, column)
+                if len(string) + len(cellValue) < charNumLimit:
+                    string = string + cellValue + separator
                     tmp = tmp + 1
                 else:
                     tmp = tmp
@@ -84,6 +90,7 @@ if __name__ == '__main__':
                 wb.saveExcel()
         input("翻译完毕,按任意键结束")
     except Exception as e:
+        wb.saveExcel()
         string = str(e)
         print(string)
         df = pandas.read_excel(fileName.replace("\"", ""), sheet_name=None)
@@ -91,3 +98,5 @@ if __name__ == '__main__':
         charLen = len("Invalid character ")
         if "Invalid character" in string:
             input("请检查文档sheet名称, 存在非法字符\"{}\", 按任意键结束".format(string[charLen:charLen+1]))
+        else:
+            input("sorry, 出bug了, QAQ")
