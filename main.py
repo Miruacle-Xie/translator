@@ -91,7 +91,7 @@ if __name__ == '__main__':
     fileName = input("\n需要翻译的文件路径：\n")
     df = pandas.read_excel(fileName.replace("\"", ""), sheet_name=None)
     # print(list(df))
-    sheetNum = input("按回车：翻译第一个表, 输入数字:指定表格{}\n".format(list(df)))
+    sheetNum = input("按回车：翻译第一个表\n\n输入数字:指定表格\n{}\n".format(list(df)))
     # '''
     seletColumn = input("\n按回车：全部翻译, 输入数字:指定列数翻译\n")
     try:
@@ -110,7 +110,7 @@ if __name__ == '__main__':
                 wb.openExcel()
                 transDocument(wb, int(seletColumn.split(" ")[i]), appid, secretKey)
                 wb.saveExcel()
-        input("翻译完毕,按任意键结束")
+        input("翻译完毕,按回车结束")
     except Exception as e:
         wb.saveExcel()
         string = str(e)
