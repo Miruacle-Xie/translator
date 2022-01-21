@@ -10,7 +10,7 @@ separator = '∞'
 
 
 def transDocument(handle, column, appid, secretKey):
-    handle.insertColumn(handle.max_column+1)
+    handle.insertColumn(handle.max_column + 1)
     translateTimeStart = time.time()
     cnt = 0
     colEndFlag = False
@@ -62,7 +62,7 @@ def transDocument(handle, column, appid, secretKey):
                     time.sleep(0.3)
             elif timeOut == 99:
                 # print("{},{}".format(cnt+1, handle.max_column))
-                handle.writeExcel(cnt+1, handle.max_column, "翻译超时")
+                handle.writeExcel(cnt + 1, handle.max_column, "翻译超时")
                 break
         cnt = tmp + cnt
         if colEndFlag:
@@ -75,7 +75,9 @@ def readIdPassword(fileName):
     f = open(fileName.replace("\"", ""), "r", encoding='UTF-8')
     string = f.read()
     f.close()
-    return string.split("\n")[0][len("APP ID："):], string.split("\n")[1][len("密钥："):]
+    print(string.split("\n")[1].find("密钥："))
+    return string.split("\n")[0][len("APP ID：") + string.split("\n")[0].find("APP ID："):], \
+           string.split("\n")[1][len("密钥：") + string.split("\n")[1].find("密钥："):]
 
 
 if __name__ == '__main__':
@@ -102,7 +104,7 @@ if __name__ == '__main__':
             wb.openExcel(list(df)[int(sheetNum) - 1])
         print("共{}行".format(wb.max_row))
         if seletColumn == "":
-            for i in range(1, wb.max_column+1):
+            for i in range(1, wb.max_column + 1):
                 transDocument(wb, i, appid, secretKey)
                 wb.saveExcel()
         else:
@@ -119,7 +121,7 @@ if __name__ == '__main__':
         print(list(df))
         charLen = len("Invalid character ")
         if "Invalid character" in string:
-            input("请检查文档sheet名称, 存在非法字符\"{}\", 按任意键结束".format(string[charLen:charLen+1]))
+            input("请检查文档sheet名称, 存在非法字符\"{}\", 按任意键结束".format(string[charLen:charLen + 1]))
         else:
             input("sorry, 出bug了, QAQ")
     # '''
